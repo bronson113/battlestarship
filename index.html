@@ -1,0 +1,406 @@
+<!Doctype html>
+<html>
+<head>
+<title>battle starship</title>
+<style>
+tab1{padding-left: 8em;}
+</style>
+</head>
+<body>
+<div align="center">
+<h1>Welcome to <strong>BATTLE STARSHIP</strong></h1>
+<canvas id="background" height=400px width=1000px>your bowser did <strong>not</strong> support html5, please use another bownser</canvas>
+<h6>For player 1(red): use 'a' or 'd' to open left or right engine, and use 'w' to shoot.<tab1>For player 2(blue): use 'j' or 'l' to open left or right engine, and use 'i' to shoot.</tab1></h6>
+<h6 id='debug'></h6>
+</div>
+<script>
+var debugmode=0;
+//setup
+var bg=document.getElementById("background");
+var redbg=bg.getContext('2d');
+var bluebg=bg.getContext('2d');
+var redbase=bg.getContext('2d');
+var bluebase=bg.getContext('2d');
+
+function drawbackground(){
+redbg.fillStyle='#FF5555';
+redbg.fillRect(0,0,500+(player1.score-player2.score)*200,400);
+bluebg.fillStyle='#5555FF';
+bluebg.fillRect(500+(player1.score-player2.score)*200,0,500-(player1.score-player2.score)*200,400);
+}
+
+function drawbase(){
+redbase.fillStyle='#FF0000';
+redbase.fillRect(0,50,125,300);
+bluebase.fillStyle='#0000FF';
+bluebase.fillRect(875,50,125,300);
+}
+
+//drawbackground();
+var left1=0,right1=0,left2=0,right2=0,shoot1=0,shoot2=0;
+
+//player setup
+var player1 = {
+    rightpush: 0,leftpush: 0,
+    health: 3,shootdelay: 0, score: 0,
+    posx: 125,posy: 200,
+    spawnx: 125, spawny: 200,
+    face: 90,
+    point1x: 0, point2x: 0, point3x: 0,
+    point1y: 0, point2y: 0, point3y: 0,
+};
+var ammo1 = {
+    posx: 0,posy: 0,
+    visable: 0, face: 0,
+    point1x: 0, piont1y: 0,
+    point2x: 0, piont2y: 0,
+};
+
+var player2 = {
+    rightpush: 0,leftpush: 0,
+    health: 3,shootdelay: 0, score: 0,
+    posx: 875,posy: 200,
+    spawnx: 875, spawny: 200,
+    face: 270,
+    point1x: 0, point2x: 0, point3x: 0,
+    point1y: 0, point2y: 0, point3y: 0,
+};
+var ammo2 = {
+    posx: 0,posy: 0,
+    visable: 0, face: 0,
+    point1x: 0, piont1y: 0,
+    point2x: 0, piont2y: 0,
+};
+//input
+var map = {};
+onkeydown = onkeyup = function check(e){
+    e = e || event;
+    map[e.keyCode] = e.type == 'keydown';
+    if(map[65]==true){left1=1;}
+    else {left1=0;}
+    if(map[68]==true){right1=1;}
+    else {right1=0;}
+    if(map[87]==true){shoot1=1;}
+    else {shoot1=0;} 
+    if(map[74]==true){left2=1;}
+    else {left2=0;}    
+    if(map[76]==true){right2=1;}
+    else {right2=0;}
+    if(map[73]==true){shoot2=1;}
+    else {shoot2=0;}
+}
+
+//output
+function drawplayer1(){
+
+//player1 body
+var p1ctx=bg.getContext('2d');
+p1ctx.beginPath();
+
+player1.point1x=player1.posx+24*Math.sin(player1.face*Math.PI/180);
+player1.point1y=player1.posy-24*Math.cos(player1.face*Math.PI/180);
+p1ctx.moveTo(player1.point1x,player1.point1y);
+
+player1.point2x=player1.posx+24*Math.sqrt(2)*Math.sin((player1.face+135)*Math.PI/180);
+player1.point2y=player1.posy-24*Math.sqrt(2)*Math.cos((player1.face+135)*Math.PI/180);
+p1ctx.lineTo(player1.point2x,player1.point2y);
+
+player1.point3x=player1.posx+24*Math.sqrt(2)*Math.sin((player1.face+225)*Math.PI/180);
+player1.point3y=player1.posy-24*Math.sqrt(2)*Math.cos((player1.face+225)*Math.PI/180);
+p1ctx.lineTo(player1.point3x,player1.point3y);
+
+p1ctx.closePath();
+p1ctx.fillStyle='#FF0000';
+p1ctx.fill();
+
+//player1 health 
+if(player1.health<3){
+var p1ctx2=bg.getContext('2d');
+p1ctx2.beginPath();
+
+if(player1.health==2){
+p1ctx.moveTo(player1.point1x,player1.point1y);
+p1ctx.lineTo(player1.posx+8*Math.sqrt(2)*Math.sin((player1.face+45)*Math.PI/180),player1.posy-8*Math.sqrt(2)*Math.cos((player1.face+45)*Math.PI/180));
+p1ctx.lineTo(player1.posx+8*Math.sqrt(2)*Math.sin((player1.face+315)*Math.PI/180),player1.posy-8*Math.sqrt(2)*Math.cos((player1.face+315)*Math.PI/180));
+}
+
+if(player1.health==1){
+p1ctx.moveTo(player1.point1x,player1.point1y);
+p1ctx.lineTo(player1.posx+8*Math.sqrt(5)*Math.sin((player1.face+90+26.6)*Math.PI/180),player1.posy-8*Math.sqrt(5)*Math.cos((player1.face+90+26.6)*Math.PI/180));
+p1ctx.lineTo(player1.posx+8*Math.sqrt(5)*Math.sin((player1.face+270-26.6)*Math.PI/180),player1.posy-8*Math.sqrt(5)*Math.cos((player1.face+270-26.6)*Math.PI/180));
+}
+
+p1ctx2.closePath();
+p1ctx2.fillStyle='#000000';
+p1ctx2.fill();
+}
+}
+
+function drawplayer2(){
+
+//player2 body
+var p2ctx=bg.getContext('2d');
+p2ctx.beginPath();
+
+player2.point1x=player2.posx+24*Math.sin(player2.face*Math.PI/180);
+player2.point1y=player2.posy-24*Math.cos(player2.face*Math.PI/180);
+p2ctx.moveTo(player2.point1x,player2.point1y);
+
+player2.point2x=player2.posx+24*Math.sqrt(2)*Math.sin((player2.face+135)*Math.PI/180);
+player2.point2y=player2.posy-24*Math.sqrt(2)*Math.cos((player2.face+135)*Math.PI/180);
+p2ctx.lineTo(player2.point2x,player2.point2y);
+
+player2.point3x=player2.posx+24*Math.sqrt(2)*Math.sin((player2.face+225)*Math.PI/180);
+player2.point3y=player2.posy-24*Math.sqrt(2)*Math.cos((player2.face+225)*Math.PI/180);
+p2ctx.lineTo(player2.point3x,player2.point3y);
+
+p2ctx.closePath();
+p2ctx.fillStyle='#0000FF';
+p2ctx.fill();
+
+//player2 health 
+if(player2.health<3){
+var p2ctx2=bg.getContext('2d');
+p2ctx2.beginPath();
+
+if(player2.health==2){
+p2ctx.moveTo(player2.point1x,player2.point1y);
+p2ctx.lineTo(player2.posx+8*Math.sqrt(2)*Math.sin((player2.face+45)*Math.PI/180),player2.posy-8*Math.sqrt(2)*Math.cos((player2.face+45)*Math.PI/180));
+p2ctx.lineTo(player2.posx+8*Math.sqrt(2)*Math.sin((player2.face+315)*Math.PI/180),player2.posy-8*Math.sqrt(2)*Math.cos((player2.face+315)*Math.PI/180));
+}
+
+if(player2.health==1){
+p2ctx.moveTo(player2.point1x,player2.point1y);
+p2ctx.lineTo(player2.posx+8*Math.sqrt(5)*Math.sin((player2.face+90+26.6)*Math.PI/180),player2.posy-8*Math.sqrt(5)*Math.cos((player2.face+90+26.6)*Math.PI/180));
+p2ctx.lineTo(player2.posx+8*Math.sqrt(5)*Math.sin((player2.face+270-26.6)*Math.PI/180),player2.posy-8*Math.sqrt(5)*Math.cos((player2.face+270-26.6)*Math.PI/180));
+}
+
+p2ctx2.closePath();
+p2ctx2.fillStyle='#000000';
+p2ctx2.fill();
+}
+}
+
+function drawammo1(){
+if(ammo1.visable==1){
+var a1ctx=bg.getContext('2d');
+a1ctx.beginPath();
+a1ctx.moveTo(ammo1.posx+15*Math.sin((ammo1.face+5)*Math.PI/180),ammo1.posy-15*Math.cos((ammo1.face+5)*Math.PI/180));
+a1ctx.lineTo(ammo1.posx+15*Math.sin((ammo1.face+175)*Math.PI/180),ammo1.posy-15*Math.cos((ammo1.face+175)*Math.PI/180));
+a1ctx.lineTo(ammo1.posx+15*Math.sin((ammo1.face+185)*Math.PI/180),ammo1.posy-15*Math.cos((ammo1.face+185)*Math.PI/180));
+a1ctx.lineTo(ammo1.posx+15*Math.sin((ammo1.face+355)*Math.PI/180),ammo1.posy-15*Math.cos((ammo1.face+355)*Math.PI/180));
+a1ctx.closePath();
+a1ctx.fillStyle='#FF0000';
+a1ctx.fill();
+ammo1.point1x=ammo1.posx+15*Math.sin(ammo1.face*Math.PI/180);
+ammo1.point1y=ammo1.posy-15*Math.cos(ammo1.face*Math.PI/180);
+ammo1.point2x=ammo1.posx-15*Math.sin(ammo1.face*Math.PI/180);
+ammo1.point2y=ammo1.posy+15*Math.cos(ammo1.face*Math.PI/180);
+}
+}
+
+function drawammo2(){
+if(ammo2.visable==1){
+var a2ctx=bg.getContext('2d');
+a2ctx.beginPath();
+a2ctx.moveTo(ammo2.posx+15*Math.sin((ammo2.face+1)*Math.PI/180),ammo2.posy-15*Math.cos((ammo2.face+5)*Math.PI/180));
+a2ctx.lineTo(ammo2.posx+15*Math.sin((ammo2.face+175)*Math.PI/180),ammo2.posy-15*Math.cos((ammo2.face+175)*Math.PI/180));
+a2ctx.lineTo(ammo2.posx+15*Math.sin((ammo2.face+185)*Math.PI/180),ammo2.posy-15*Math.cos((ammo2.face+185)*Math.PI/180));
+a2ctx.lineTo(ammo2.posx+15*Math.sin((ammo2.face+355)*Math.PI/180),ammo2.posy-15*Math.cos((ammo2.face+355)*Math.PI/180));
+a2ctx.closePath();
+a2ctx.fillStyle='#0000FF';
+a2ctx.fill();
+ammo2.point1x=ammo2.posx+15*Math.sin(ammo2.face*Math.PI/180);
+ammo2.point1y=ammo2.posy-15*Math.cos(ammo2.face*Math.PI/180);
+ammo2.point2x=ammo2.posx-15*Math.sin(ammo2.face*Math.PI/180);
+ammo2.point2y=ammo2.posy+15*Math.cos(ammo2.face*Math.PI/180);
+}
+}
+
+function draw(){
+drawbackground();
+drawplayer1();
+drawplayer2();
+drawammo1();
+drawammo2();
+drawbase();
+}
+
+//logic
+var t1 =setInterval(logic, 20);
+function handleinput(){
+
+//change push
+if(left1==1){player1.leftpush=2;}
+else if(player1.leftpush>0){player1.leftpush -= 0.05;}
+if(right1==1){player1.rightpush=2;}
+else if(player1.rightpush>0){player1.rightpush -= 0.05;}
+if(left2==1){player2.leftpush=2;}
+else if(player2.leftpush>0){player2.leftpush -= 0.05;}
+if(right2==1){player2.rightpush=2;}
+else if(player2.rightpush>0){player2.rightpush -= 0.05;}
+
+//player1 shoot
+if(shoot1==1 && player1.shootdelay==0 && ammo1.visable==0){
+ammo1.visable = 1;
+ammo1.posx=player1.posx;
+ammo1.posy=player1.posy;
+ammo1.face=player1.face;
+player1.shootdelay=50;
+}
+else {
+player1.shootdelay-=1;
+if(player1.shootdelay < 0){player1.shootdelay=0;}
+}
+
+//player2 shoot
+if(shoot2==1 && player2.shootdelay==0 && ammo2.visable==0){
+ammo2.visable = 1;
+ammo2.posx=player2.posx;
+ammo2.posy=player2.posy;
+ammo2.face=player2.face;
+player2.shootdelay=50;
+}
+else {
+player2.shootdelay-=1;
+if(player2.shootdelay < 0){player2.shootdelay=0;}
+}
+
+}
+
+function getDis( x1, y1, x2, y2){
+var forfunctionreturn = Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1)); 
+return forfunctionreturn;
+}
+
+function movementOfPlayer(){
+
+//player1
+player1.face+=(player1.leftpush - player1.rightpush);
+if(player1.face<0){player1.face+=360;}
+if(player1.face>360){player1.face-=360;}
+player1.posx += (player1.leftpush+player1.rightpush)*Math.sin(player1.face*Math.PI/180);
+player1.posy -= (player1.leftpush+player1.rightpush)*Math.cos(player1.face*Math.PI/180);
+if(player1.posx<0){player1.posx=0;}
+if(player1.posy<0){player1.posy=0;}
+if(player1.posx>1000){player1.posx=1000;}
+if(player1.posy>400){player1.posy=400;}
+
+//player2
+player2.face+=(player2.leftpush - player2.rightpush);
+if(player2.face<0){player2.face+=360;}
+if(player2.face>360){player2.face-=360;}
+player2.posx += (player2.leftpush+player2.rightpush)*Math.sin(player2.face*Math.PI/180);
+player2.posy -= (player2.leftpush+player2.rightpush)*Math.cos(player2.face*Math.PI/180);
+if(player2.posx<0){player2.posx=0;}
+if(player2.posy<0){player2.posy=0;}
+if(player2.posx>1000){player2.posx=1000;}
+if(player2.posy>400){player2.posy=400;}
+
+//ammo1
+ammo1.posx += 10*Math.sin(ammo1.face*Math.PI/180);
+ammo1.posy -= 10*Math.cos(ammo1.face*Math.PI/180);
+if(ammo1.posx<0||ammo1.posx>1000||ammo1.posy<0||ammo1.posy>400){
+ammo1.visable=0;
+}
+
+//ammo2
+ammo2.posx += 10*Math.sin(ammo2.face*Math.PI/180);
+ammo2.posy -= 10*Math.cos(ammo2.face*Math.PI/180);
+if(ammo2.posx<0||ammo2.posx>1000||ammo2.posy<0||ammo2.posy>400){
+ammo2.visable=0;
+}
+
+//check ammo1 hit 
+if(getDis(ammo1.point1x,ammo1.point1y,player2.point1x,player2.point1y) < 24*Math.sqrt(5) && getDis(ammo1.point1x,ammo1.point1y,player2.point2x,player2.point2y) < 24*Math.sqrt(5) && getDis(ammo1.point1x,ammo1.point1y,player2.point3x,player2.point3y) < 24*Math.sqrt(5)){
+ammo1.visable=0;
+ammo1.posx=0;
+ammo1.posy=0;
+ammo1.point1x=0;
+ammo1.point1y=0;
+ammo1.point2x=0;
+ammo1.point2y=0;
+player2.health-=1;
+}
+
+//check ammo2 hit
+if(getDis(ammo2.point1x,ammo2.point1y,player1.point1x,player1.point1y) < 24*Math.sqrt(5) && getDis(ammo2.point1x,ammo2.point1y,player1.point2x,player1.point2y) < 24*Math.sqrt(5) && getDis(ammo2.point1x,ammo2.point1y,player1.point3x,player1.point3y) < 24*Math.sqrt(5)){
+ammo2.visable=0;
+ammo2.posx=0;
+ammo2.posy=0;
+ammo2.point1x=0;
+ammo2.point1y=0;
+ammo2.point2x=0;
+ammo2.point2y=0;
+player1.health-=1;
+}
+
+}
+
+function checkdied(){
+
+if(player1.health<=0){
+player1.health=3;
+player1.posx=player1.spawnx;
+player1.posy=player1.spawny;
+player1.face=90;
+player2.score+=1;
+}
+
+if(player2.health<=0){
+player2.health=3;
+player2.posx=player2.spawnx;
+player2.posy=player2.spawny;
+player2.face=270;
+player1.score+=1;
+}
+
+}
+
+function checkwin(){
+
+//player1 win
+if(player1.score-player2.score>=3){
+clearInterval(t1);
+drawbackground();
+var win1=bg.getContext('2d');
+win1.font= "75px Times New Roman";
+win1.fillStyle="#995555";
+win1.textAlign= "center";
+win1.fillText("!!!Player 1 win!!!",500,200);
+}
+
+//player2.win
+if(player2.score-player1.score>=3){
+clearInterval(t1);
+drawbackground();
+var win2=bg.getContext('2d');
+win2.font= "75px Times New Roman";
+win2.fillStyle="#555599";
+win2.textAlign= "center";
+win2.fillText("!!!Player 2 win!!!",500,200);
+}
+
+}
+
+function logic(){
+handleinput();
+movementOfPlayer();
+checkdied();
+draw();
+
+if(debugmode==1){
+var x="";
+x += player1.score+' '+player2.score;
+if(player1.score-player2.score>=3)x='player1 win';
+if(player2.score-player1.score>=3)x='player2 win';
+document.getElementById("debug").innerHTML=x;
+}
+
+checkwin();
+
+}
+
+</script>
+</body>
+</html>
