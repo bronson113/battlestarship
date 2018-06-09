@@ -23,14 +23,14 @@ var redbase=bg.getContext('2d');
 var bluebase=bg.getContext('2d');
 
 function drawbackground(){
-redbg.fillStyle='#FF5555';
+redbg.fillStyle='#FF9999';
 redbg.fillRect(0,0,500+(player1.score-player2.score)*200,400);
-bluebg.fillStyle='#5555FF';
+bluebg.fillStyle='#9999FF';
 bluebg.fillRect(500+(player1.score-player2.score)*200,0,500-(player1.score-player2.score)*200,400);
 }
 
 function drawbase(){
-redbase.fillStyle='#FF0000';
+redbase.fillStyle='#FF4500';
 redbase.fillRect(0,50,125,300);
 bluebase.fillStyle='#0000FF';
 bluebase.fillRect(875,50,125,300);
@@ -110,7 +110,7 @@ player1.point3y=player1.posy-24*Math.sqrt(2)*Math.cos((player1.face+225)*Math.PI
 p1ctx.lineTo(player1.point3x,player1.point3y);
 
 p1ctx.closePath();
-p1ctx.fillStyle='#FF0000';
+p1ctx.fillStyle='#FF4500';
 p1ctx.fill();
 
 //player1 health 
