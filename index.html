@@ -312,7 +312,7 @@ ammo2.visable=0;
 }
 
 //check ammo1 hit 
-if(getDis(ammo1.point1x,ammo1.point1y,player2.point1x,player2.point1y) < 24*Math.sqrt(5) && getDis(ammo1.point1x,ammo1.point1y,player2.point2x,player2.point2y) < 24*Math.sqrt(5) && getDis(ammo1.point1x,ammo1.point1y,player2.point3x,player2.point3y) < 24*Math.sqrt(5)){
+if(getDis(ammo1.point1x,ammo1.point1y,player2.point1x,player2.point1y) < 24*Math.sqrt(5) && getDis(ammo1.point1x,ammo1.point1y,player2.point2x,player2.point2y) < 24*Math.sqrt(5) && getDis(ammo1.point1x,ammo1.point1y,player2.point3x,player2.point3y) < 24*Math.sqrt(5) && ammo1.visable==1){
 ammo1.visable=0;
 ammo1.posx=0;
 ammo1.posy=0;
@@ -324,7 +324,7 @@ player2.health-=1;
 }
 
 //check ammo2 hit
-if(getDis(ammo2.point1x,ammo2.point1y,player1.point1x,player1.point1y) < 24*Math.sqrt(5) && getDis(ammo2.point1x,ammo2.point1y,player1.point2x,player1.point2y) < 24*Math.sqrt(5) && getDis(ammo2.point1x,ammo2.point1y,player1.point3x,player1.point3y) < 24*Math.sqrt(5)){
+if(getDis(ammo2.point1x,ammo2.point1y,player1.point1x,player1.point1y) < 24*Math.sqrt(5) && getDis(ammo2.point1x,ammo2.point1y,player1.point2x,player1.point2y) < 24*Math.sqrt(5) && getDis(ammo2.point1x,ammo2.point1y,player1.point3x,player1.point3y) < 24*Math.sqrt(5) && ammo2.visable==1){
 ammo2.visable=0;
 ammo2.posx=0;
 ammo2.posy=0;
