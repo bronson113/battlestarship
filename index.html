@@ -16,10 +16,10 @@ tab1{padding-left: 8em;}
 <h6 id='debug'></h6>
 </div>
 <script>
-var debugmode=1;
+var debugmode=0;
 
 //setup
-var speedx=3;
+var speedx=1;
 var bg=document.getElementById("background");
 var redbg=bg.getContext('2d');
 var bluebg=bg.getContext('2d');
@@ -33,6 +33,7 @@ var bluetower=false;
 var redtowerdelay=0;
 var bluetowerdelay=0;
 var kill=0;
+var win=0;
 var mid_place=500;
 var reset=false;
 var bombs=[];
@@ -127,6 +128,7 @@ var ammo2 = {
 };
 
 function Bomb(side,face){
+    this.size=20;
     this.side=side;//0->red,1->blue
     this.face=face
     if(this.side==0){
@@ -137,11 +139,12 @@ function Bomb(side,face){
     }
     this.visable=true
 }
+
 Bomb.prototype.update = function (){
     //move
     this.x -= 3*Math.sin(this.face);
     this.y += 3*Math.cos(this.face);
-    if(this.x<0||this.x>1000||this.y<0||this.y>400){
+    if(this.x<0||this.x>1000||this.y<0||this.y>400||win!=0){
         this.visable=false;
     }
 
@@ -149,7 +152,7 @@ Bomb.prototype.update = function (){
     if(this.visable){
         console.log(this.face);
         bomb.beginPath();
-        bomb.arc(this.x,this.y,20,0,2*Math.PI,true);
+        bomb.arc(this.x,this.y,this.size,0,2*Math.PI,true);
         if(this.side==0) bomb.fillStyle='#FF4500';
         else if(this.side==1) bomb.fillStyle='#0000FF';
         bomb.closePath();
@@ -157,17 +160,17 @@ Bomb.prototype.update = function (){
     }
     //hit
     if(this.side==0){
-        if(getDis(this.x,this.y,player2.point1x,player2.point1y) < 24*Math.sqrt(5)+30
-            && getDis(this.x,this.y,player2.point2x,player2.point2y) < 24*Math.sqrt(5)+30
-            && getDis(this.x,this.y,player2.point3x,player2.point3y) < 24*Math.sqrt(5)+30
+        if(getDis(this.x,this.y,player2.point1x,player2.point1y) < 24*Math.sqrt(5)+this.size
+            && getDis(this.x,this.y,player2.point2x,player2.point2y) < 24*Math.sqrt(5)+this.size
+            && getDis(this.x,this.y,player2.point3x,player2.point3y) < 24*Math.sqrt(5)+this.size
             && this.visable==1){
             this.visable=0;
             player2.health-=2;
         }
     }else if(this.side==1){
-        if(getDis(this.x,this.y,player1.point1x,player1.point1y) < 24*Math.sqrt(5)+30
-            && getDis(this.x,this.y,player1.point2x,player1.point2y) < 24*Math.sqrt(5)+30
-            && getDis(this.x,this.y,player1.point3x,player1.point3y) < 24*Math.sqrt(5)+30
+        if(getDis(this.x,this.y,player1.point1x,player1.point1y) < 24*Math.sqrt(5)+this.size
+            && getDis(this.x,this.y,player1.point2x,player1.point2y) < 24*Math.sqrt(5)+this.size
+            && getDis(this.x,this.y,player1.point3x,player1.point3y) < 24*Math.sqrt(5)+this.size
             && this.visable==1){
             this.visable=0;
             player1.health-=2;
@@ -175,26 +178,9 @@ Bomb.prototype.update = function (){
     }
 }
 
-//input
-var map = {};
-onkeydown = onkeyup = function check(e){
-    e = e || event;
-    map[e.keyCode] = e.type == 'keydown';
-    if(map[65]==true){left1=1;}//a
-    else {left1=0;}
-    if(map[68]==true){right1=1;}//d
-    else {right1=0;}
-    if(map[87]==true){shoot1=1;}//w
-    else {shoot1=0;}
-    if(map[74]==true){left2=1;}//j
-    else {left2=0;}
-    if(map[76]==true){right2=1;}//l
-    else {right2=0;}
-    if(map[73]==true){shoot2=1;}//i
-    else {shoot2=0;}
-    if(map[82]==true){reset=true;}//r
-    else {reset=false;}
-}
+//function ammo(side, face){
+//    this
+//}
 
 //output
 function drawplayer1(){
@@ -342,6 +328,27 @@ function draw(){
     drawammo2();
     drawbombs();
     drawbase();
+}
+
+//input
+var map = {};
+onkeydown = onkeyup = function check(e){
+    e = e || event;
+    map[e.keyCode] = e.type == 'keydown';
+    if(map[65]==true){left1=1;}//a
+    else {left1=0;}
+    if(map[68]==true){right1=1;}//d
+    else {right1=0;}
+    if(map[87]==true){shoot1=1;}//w
+    else {shoot1=0;}
+    if(map[74]==true){left2=1;}//j
+    else {left2=0;}
+    if(map[76]==true){right2=1;}//l
+    else {right2=0;}
+    if(map[73]==true){shoot2=1;}//i
+    else {shoot2=0;}
+    if(map[82]==true){reset=true;}//r
+    else {reset=false;}
 }
 
 //logic
@@ -494,8 +501,10 @@ function checkdied(){
 }
 
 function checkwin(){
+
     //player1 win
     if(player1.score-player2.score>=3){
+        win=1;
     //clearInterval(t1);
         drawbackground();
         var win1=bg.getContext('2d');
@@ -525,11 +534,13 @@ function checkwin(){
 
             kill=0;
             mid_place=500;
+            win=0;
         }
     }
 
     //player2.win
     if(player2.score-player1.score>=3){
+        win=-1;
         //clearInterval(t1);
         drawbackground();
         var win2=bg.getContext('2d');
@@ -559,6 +570,7 @@ function checkwin(){
 
             kill=0;
             mid_place=500;
+            win=0;
         }
     }
 }
